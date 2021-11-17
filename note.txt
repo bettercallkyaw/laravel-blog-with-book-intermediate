@@ -1,0 +1,30 @@
+(1) – Laravel Project
+(2) – Routing
+(3) – Model – View - Controller
+(4) – Controller
+     (i)php artisan make:controller PostController -r
+     (ii)php artisan make:controller Product/ProductController -r
+(5) – View
+(6) – Migration and Model
+      (i)php artisan make:model Post -m
+      (ii)php artisan make:factory PostFactory
+      (iii)php artisan make:seeder PostTableSeeder
+(7) - Authentication
+    (i)composer require laravel/ui
+    (ii)php artisan ui bootstrap --auth
+    (iii)npm install
+    (iv)npm run dev
+(8) – Master Template
+(9) – Form
+      (i)composer require intervention/image
+(10) - Relationship
+       (i)php artisan make:model Category -m
+       (ii)php artisan make:model Comment -m
+       (iii)php artisan migrate:fresh
+       (iv)php artisan make:factory CategoryFactory --model=Category
+       (v)php artisan make:factory CommentFactory --model=Comment
+       (vi)php artisan db:seed
+(11) – Authorization
+(12) – Basic API
+(13) – Deployment
+(14) – What’s Next
