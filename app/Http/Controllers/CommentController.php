@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Comment;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 
 class CommentController extends Controller
 {
@@ -12,6 +13,11 @@ class CommentController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
+    public function __construct()
+    {
+        $this->middleware('auth');
+    }
+
     public function index()
     {
         //
@@ -42,6 +48,7 @@ class CommentController extends Controller
         $comment=new Comment();
         $comment->content=$request->content;
         $comment->post_id=$request->post_id;
+        $comment->user_id=auth()->user()->id;
         $comment->save();
         return redirect()->back()->with('successMsg','comment added successfully');
     }
@@ -88,7 +95,34 @@ class CommentController extends Controller
      */
     public function destroy($id)
     {
+        // $comment=Comment::findOrFail($id);
+        // $comment->delete();
+        // return back()->with('status','comment deleted successfully');
+
+        //no gate and policies with method
+        // $comment=Comment::findOrFail($id);
+        // if($comment->user_id==auth()->user()->id){
+        //     $comment->delete();
+        //     return back()->with('status','comment deleted successfully');
+        // }else{
+        //     return back()->with('error','unauthorize');
+        // }
+
+        //gate with allows method
+        // $comment=Comment::findOrFail($id);
+        // if(Gate::allows('comment-delete',$comment)){
+        //     $comment->delete();
+        //     return back()->with('status','comment deleted successfully');
+        // }else{
+        //     return back()->with('error','unauthorize');
+        // }
+
+        //gate with denies method
         $comment=Comment::findOrFail($id);
+        if(Gate::denies('comment-delete',$comment)){
+             return back()->with('error','unauthorize');
+        }
+
         $comment->delete();
         return back()->with('status','comment deleted successfully');
     }

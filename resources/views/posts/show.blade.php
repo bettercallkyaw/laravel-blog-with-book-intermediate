@@ -4,6 +4,13 @@
 
 @section('content')
     <div class="container">
+
+        @if (Session::has('session'))
+            <div class="alert alert-warning">
+                {{ Session::get('session') }}
+            </div>
+        @endif
+
         <div class="card mb-2">
             <div class="card-body">
                 <img src="{{ asset('storage/posts/' . $post->image) }}" alt="" height="300" width="300">
@@ -12,10 +19,15 @@
                     {{ $post->created_at->diffForHumans() }}
                     Category: <b>{{ $post->category->name }}</b>
                 </div>
+                <div class="card-subtitle mb-2 text-muted small">
+                    Author:<b>{{ $post->user->name }}</b>
+                </div>
                 <p class="card-text">{{ $post->content }}</p>
                 <a class="btn btn-info" href="{{ route('all.posts') }}">
                     Back
                 </a>
+                
+                @auth
                 <button class="btn btn-danger waves-effect" type="button" onclick="deletePost({{ $post->id }})">
                     <i class="material-icons">delete</i>
                 </button>
@@ -26,6 +38,7 @@
                     @method('DELETE')
 
                 </form>
+                @endauth
             </div>
         </div>
 
@@ -35,11 +48,18 @@
             </div>
         @endif
 
+        @if (Session::has('error'))
+            <div class="alert alert-warning">
+                {{ Session::get('error') }}
+            </div>
+        @endif
+
 
         <ul class="list-group">
             <li class="list-group-item active">
                 <b>Comments ({{ count($post->comments) }})</b>
             </li>
+            <br>
             @foreach ($post->comments as $comment)
                 <li class="list-group-item">
                     {{ $comment->content }}
@@ -54,6 +74,10 @@
                         @method('DELETE')
 
                     </form>
+                    <div class="small mt-2">
+                        By <b>{{ $comment->user->name }}</b>
+                        {{ $comment->created_at->diffForHumans() }}
+                    </div>
                 </li>
             @endforeach
         </ul>
@@ -66,18 +90,20 @@
             </div>
         @endif
 
-        <form action="{{ route('comments.store') }}" method="post">
-            @csrf
-            <input type="hidden" name="post_id" value="{{ $post->id }}">
-            <textarea name="content" class="form-control mb-2 @error('content') is-invalid @enderror"
-                placeholder="New Comment"></textarea>
-            @error('content')
-                <span class="invalid-feedback" role="alert">
-                    <strong>{{ $message }}</strong>
-                </span>
-            @enderror
-            <input type="submit" value="Add Comment" class="btn btn-secondary">
-        </form>
+      @auth
+      <form action="{{ route('comments.store') }}" method="post">
+        @csrf
+        <input type="hidden" name="post_id" value="{{ $post->id }}">
+        <textarea name="content" class="form-control mb-2 @error('content') is-invalid @enderror"
+            placeholder="New Comment"></textarea>
+        @error('content')
+            <span class="invalid-feedback" role="alert">
+                <strong>{{ $message }}</strong>
+            </span>
+        @enderror
+        <input type="submit" value="Add Comment" class="btn btn-secondary">
+    </form>
+      @endauth
 
     </div>
 @endsection

@@ -2,10 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Category;
 use Carbon\Carbon;
 use App\Models\Post;
+use App\Models\Category;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 use Intervention\Image\Facades\Image;
 use Illuminate\Support\Facades\Storage;
 
@@ -17,6 +18,12 @@ class PostController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
+
+     public function __construct()
+     {
+         $this->middleware('auth')->except(['index','show']);
+     }
+
     public function index()
     {
        $posts=Post::latest()->simplePaginate($this->limited);
@@ -52,7 +59,7 @@ class PostController extends Controller
             'image'=>'required|mimes:png,jpg,jpeg',
             'title'=>'required',
             'content'=>'required',
-            'category_id'=>'required'
+            'category_id'=>'required',
         ]);
 
 
@@ -82,6 +89,7 @@ class PostController extends Controller
         $post->title=$request->title;
         $post->content=$request->content;
         $post->category_id=$request->category_id;
+        $post->user_id=auth()->user()->id;
         $post->save();
         return redirect()->route('all.posts')->with('successMsg','post added successfully');
     }
@@ -130,11 +138,16 @@ class PostController extends Controller
     public function destroy($id)
     {
         $post=Post::findOrFail($id);
-        //delete old image
-        if (Storage::disk('public')->exists('posts/'.$post->image)) {
-            Storage::disk('public')->delete('posts/'.$post->image);
-           } 
-        $post->delete();
-        return redirect()->route('all.posts')->with('status','posts deleted successfully');
+        //delete old image 
+           if(Gate::allows('post-delete',$post)){
+              //delete old image
+              if (Storage::disk('public')->exists('posts/'.$post->image)) {
+                Storage::disk('public')->delete('posts/'.$post->image);
+               }
+                $post->delete();
+                return back()->with('status','post deleted successfully');
+            }else{
+                return back()->with('session','unauthorize');
+            }
     }
 }
