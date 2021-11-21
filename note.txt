@@ -28,3 +28,7 @@
 (12) – Basic API
 (13) – Deployment
 (14) – What’s Next
+
+https://betterprogramming.pub/hosting-your-laravel-app-on-heroku-198764167a85
+
+https://medium.com/geekculture/laravel-v8-authentication-for-user-and-admin-using-middleware-f14171aa4efa
